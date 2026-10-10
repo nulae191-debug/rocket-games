@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+body{margin:0;padding:20px;background:#101522;color:white;font-family:Arial;text-align:center}
+h1{color:#8caaff}
+.balance,.game{background:#202a40;padding:20px;border-radius:18px;margin:14px 0}
+button{border:0;border-radius:12px;padding:14px;margin:5px;background:#8c9fff;color:#101522;font-weight:bold;font-size:16px}
+button:active{transform:scale(.96)}
+#result{color:#5df0ac;min-height:24px}
+</style>
+</head>
+<body>
+<h1>🚀 Rocket Games</h1>
+<div class="balance">🪙 Баланс: <b id="coins">1000</b></div>
+
+<div class="game">
+<h2>🎡 Рулетка</h2>
+<p>Выбери цвет</p>
+<button onclick="roulette('🔴')">🔴 Красное</button>
+<button onclick="roulette('⚫')">⚫ Чёрное</button>
+</div>
+
+<div class="game">
+<h2>🎯 Дартс</h2>
+<button onclick="darts()">Бросить дротик</button>
+</div>
+
+<div class="game">
+<h2>🎰 Слоты</h2>
+<button onclick="slots()">Крутить барабаны</button>
+</div>
+
+<p id="result">Выбери игру!</p>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand()}
+
+let coins = Number(localStorage.getItem("coins") || 1000);
+const symbols = ["🍒","⭐","💎","🚀","🍋"];
+
+function update(){
+ document.getElementById("coins").textContent=coins;
+ localStorage.setItem("coins",coins);
+}
+function msg(text){
+ document.getElementById("result").textContent=text;
+}
+function roulette(choice){
+ if(coins<50)return msg("Не хватает монет!");
+ coins-=50;
+ let result=Math.random()<0.5?"🔴":"⚫";
+ if(result===choice){coins+=100;msg("🎉 Победа! +100 монет")}
+ else msg("Выпало "+result+". Попробуй ещё!");
+ update();
+}
+function darts(){
+ if(coins<20)return msg("Не хватает монет!");
+ coins-=20;
+ let points=[0,5,10,15,20,25,50][Math.floor(Math.random()*7)];
+ coins+=points*2;
+ msg("🎯 Очки: "+points+" · Монет получено: "+points*2);
+ update();
+}
+function slots(){
+ if(coins<30)return msg("Не хватает монет!");
+ coins-=30;
+ let a=symbols[Math.floor(Math.random()*5)];
+ let b=symbols[Math.floor(Math.random()*5)];
+ let c=symbols[Math.floor(Math.random()*5)];
+ if(a===b&&b===c){coins+=150;msg(a+" "+b+" "+c+" — джекпот! +150")}
+ else if(a===b||b===c||a===c){coins+=45;msg(a+" "+b+" "+c+" — пара! +45")}
+ else msg(a+" "+b+" "+c+" — не повезло!");
+ update();
+}
+update();
+</script>
+</body>
+</html>
